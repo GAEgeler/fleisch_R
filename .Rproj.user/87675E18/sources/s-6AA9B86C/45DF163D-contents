@@ -5,9 +5,16 @@ date: "26. Juli 2018"
 output: pdf_document
 ---
 
-# load data
+# load required packages
+
 ```{r}
 
+```
+
+
+# load data
+```{r}
+meat.ch <- read_delim(here("data", "MeatDistribution_NOVANIMAL.csv"), delim = ",")
 ```
 
 
