@@ -1,0 +1,121 @@
+---
+title: "NOVANIMAL - Informationsplakat zur Fleischproduktion und zum Fleischkonsum in der Schweiz"
+author: "Flavio von Rickenbach"
+date: "`r Sys.Date()`"
+output: html_notebook
+pdf_document: default
+html_document: 
+ df_print: paged
+---
+
+In diesem Dokument befinden sich Plots zur Fleischproduktion und zum Fleischkonsum in der Schweiz
+
+```{r}
+# load required packages
+lapply(c("readxl","dplyr","ggplot2","readr","tidyr", "here"), FUN = function(X) {
+    do.call("library", list(X))}) 
+```
+
+
+Function for coloring text with dark backgrounds
+```{r}
+## function to check if the background color is dark or not -------------------
+# source: https://trendct.org/2016/01/22/how-to-choose-a-label-color-to-contrast-with-background/
+# source 2: https://stackoverflow.com/questions/49716005/how-to-control-label-color-depending-on-fill-darkness-of-bars
+
+isDark <- function(color) {
+    (sum(grDevices::col2rgb(color) *c(299, 587,114))/1000 < 123)
+}
+```
+
+
+two of mythemes for plots
+
+```{r, echo=F}
+
+# my theme 1: for regular plots
+mytheme <- theme_bw()+ # definve theme for plot
+    theme(plot.title = element_text(size = 20, face = "bold"),
+          axis.text.x = element_text(size=20),
+          axis.text.y = element_text(size=20, face = "plain"),
+          legend.text = element_text(size = 20),
+          legend.title = element_text(size =20),
+          axis.title.y = element_text(size = 25, margin = margin(t = 0, r = 20, b = 0, l = 0)),
+          axis.title.x = element_text(size = 25,  margin = margin(t = 20, r = 0, b = 0, l = 0)),
+          plot.subtitle=element_text(margin=margin(b=15),size = 20),
+          plot.caption=element_text(margin=margin(t=15), face="italic", size=20))
+
+
+### MY Theme 4: for plots with text of x axis 90 degrees -------------------
+mytheme4 <- theme_bw()+ # definve theme for plot
+    theme(plot.title = element_text(size = 20, face = "bold"),
+          axis.text.x = element_text(size=17,angle = 90, vjust=0.5, hjust=1),
+          axis.text.y = element_text(size=20, face = "plain"),
+          legend.text = element_text(size = 20),
+          legend.title = element_text(size =20),
+          axis.title.y = element_text(size = 25, margin = margin(t = 0, r = 20, b = 0, l = 0)),
+          axis.title.x = element_text(size = 25,  margin = margin(t = 20, r = 0, b = 0, l = 0)),
+          plot.subtitle=element_text(margin=margin(b=15),size = 8),
+          plot.caption=element_text(margin=margin(t=15), face="italic", size=8))
+```
+
+Fleischproduktion in der Schweiz von 1961 bis 2016 
+
+
+load data
+
+
+```{r, echo=FALSE}
+df.tot <-  read_delim(here("data", "produktion_FAO_CH_ink_other_180725.csv"), delim =';', locale = locale(encoding = 'ISO-8859-2'), col_types = cols(Value = col_number() ))
+
+```
+
+prepare data
+```{r}
+df.cat <- subset(df.tot, !grepl("Meat", Item))
+df.cat$Item <- factor(df.cat$Item, ordered = T, levels = c("überige Tiere", "Schafe+Ziegen",  "Geflügel", "Rind", "Schwein"))
+```
+
+Barplot Fleischangebot in der Schweiz von 1961 bis 2016 
+```{r}
+ggplot(data=df.cat, aes(x = Year, y = Value, fill = Item, width=0.75))+
+  geom_bar(stat = 'identity')+
+  scale_y_continuous(name="Schlachtgewichtszahlen in Tonnen", labels = function(x) format(x, big.mark = "'", scientific = FALSE))+
+  scale_x_continuous(breaks = seq(1961, 2016, 5), limits = c(1960, 2017))+
+  scale_fill_manual("Tierarten", values = c("Schwein"="#fad60d","Rind" = "#c5b87c","Geflügel" = "#262626","Schafe+Ziegen"="#008099", "überige Tiere"="#e64d00"))+
+  ggtitle("Fleischproduktion in der Schweiz 1961 - 2016")+
+  mytheme
+  
+  ggsave(here("figs", "Bar_Produktion_Fleisch_CH.pdf"),
+         width = 17,
+         height = 8,
+         dpi=600,
+         units="in",
+         device="pdf")
+
+ 
+```
+Area Fleischangebot in der Schweiz von 1961 bis 2016 
+```{r}
+ggplot(data=df.cat, aes(x = Year, y = Value, fill = Item, width=0.75))+
+  geom_area(stat = 'identity')+
+  scale_y_continuous(name="Schlachtgewichtszahlen in Tonnen", labels = function(x) format(x, big.mark = "'", scientific = FALSE))+
+  scale_x_continuous(breaks = seq(1961, 2016, 5), limits = c(1960, 2017))+
+  scale_fill_manual("Tierarten", values = c("Schwein"="#fad60d","Rind" = "#c5b87c","Geflügel" = "#262626","Schafe+Ziegen"="#008099", "überige Tiere"="#e64d00"))+
+  ggtitle("Fleischproduktion in der Schweiz 1961 - 2016")+
+  mytheme
+  
+  ggsave(here("figs", "Area_Produktion_Fleisch_CH.pdf"),
+         width = 17,
+         height = 8,
+         dpi=600,
+         units="in",
+         device="pdf")
+
+ 
+```
+2. Pro Kopf-Fleischangebot und -Fleischkonsum in der Schweiz 
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
