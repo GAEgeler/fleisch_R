@@ -12,7 +12,7 @@ In diesem Dokument befinden sich Plots zur Fleischproduktion und zum Fleischkons
 
 ```{r}
 # load required packages
-lapply(c("readxl","dplyr","ggplot2","readr","tidyr", "here"), FUN = function(X) {
+lapply(c("readxl","dplyr","ggplot2","readr","tidyr", "here", "stringr"), FUN = function(X) {
     do.call("library", list(X))}) 
 ```
 
@@ -66,7 +66,7 @@ load data
 
 
 ```{r, echo=FALSE}
-df.tot <-  read_delim(here("data", "produktion_FAO_CH_ink_other_180725.csv"), delim =';', locale = locale(encoding = 'ISO-8859-2'), col_types = cols(Value = col_number() ))
+df.tot <-  read_delim(here("data", "produktion_FAO_CH_ink_other_180725.csv"), delim =';', locale = locale(encoding = 'ISO-8859-2'))
 
 ```
 
@@ -99,11 +99,13 @@ Area Fleischangebot in der Schweiz von 1961 bis 2016
 ```{r}
 ggplot(data=df.cat, aes(x = Year, y = Value, fill = Item, width=0.75))+
   geom_area(stat = 'identity')+
-  scale_y_continuous(name="Schlachtgewichtszahlen in Tonnen", labels = function(x) format(x, big.mark = "'", scientific = FALSE))+
+  scale_y_continuous(name = "Schlachtgewichtszahlen in Tonnen", labels = function(x) format(x, big.mark = "'", scientific = FALSE))+
   scale_x_continuous(breaks = seq(1961, 2016, 5), limits = c(1960, 2017))+
   scale_fill_manual("Tierarten", values = c("Schwein"="#fad60d","Rind" = "#c5b87c","Geflügel" = "#262626","Schafe+Ziegen"="#008099", "überige Tiere"="#e64d00"))+
   ggtitle("Fleischproduktion in der Schweiz 1961 - 2016")+
   mytheme
+
+
   
   ggsave(here("figs", "Area_Produktion_Fleisch_CH.pdf"),
          width = 17,
@@ -116,4 +118,79 @@ ggplot(data=df.cat, aes(x = Year, y = Value, fill = Item, width=0.75))+
 ```
 2. Pro Kopf-Fleischangebot und -Fleischkonsum in der Schweiz 
 
-Testen ob Git funktioniert
+```{r, echo=FALSE}
+df.tot <-  read_delim(here("data", "Kopf_Konsum_FAO_Proviand_menuCH_180726_vori.csv"), delim =';', locale = locale(encoding = 'ISO-8859-2'))
+
+```
+Für jede Quelle einen anderen Datensatz
+```{r}
+df.fao <- subset(df.tot, grepl("FAO", Quelle))
+df.cat$Item <- factor(df.cat$Item, ordered = T, levels = c("überige Tiere", "Schafe+Ziegen",  "Geflügel", "Rind", "Schwein"))
+```
+
+
+Barplot Pro Kopf-Fleischangebot und -Fleischkonsum in der Schweiz und Weltweit
+```{r}
+ggplot(data=df.tot, aes(x = reorder(Item, Value), y = Value, width=0.75))+
+  geom_bar(stat = 'identity', fill="#fad60d")+
+  
+  scale_y_continuous(name="Kilogramm pro Kopf und Jahr")+
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20))+
+
+  ggtitle("Fleischkonsum")+
+  coord_flip()
+  mytheme
+  
+  ggsave(here("figs", "Bar_Fleisch_Konsum_CH.pdf"),
+         width = 17,
+         height = 8,
+         dpi=600,
+         units="in",
+         device="pdf")
+```
+  
+  
+  
+  
+```{r, echo=FALSE}
+df.tot <-  read_delim(here("data", "Konsum_2016_nach_Art_Proviande_180725_vori.csv"), delim =';', locale = locale(encoding = 'ISO-8859-2'))
+
+```
+
+```{r}
+table(df.tot$Value)
+Fleischart.n <- c(  'Schwein (22.21)'=22.21, 'Rind (13.6)'=13.6, 'Geflügel (11.83)'=11.83, 'Schaf+Ziege (1.26)'=1.26, 'überige Tiere (1.10)'=1.10)
+
+piepercent<- round(100*Fleischart.n/sum(Fleischart.n), 1)
+pielabels<- paste(piepercent, "%", sep="")
+
+pie(Fleischart.n, labels= pielabels, col = c("#c5b87c", "#008099", "#fad60d", "#9ed129", "#e64d00"), init.angle = 90, clockwise = T)
+legend("topright", c("Schwein","Rind","Geflügel","Schaf+Ziege", "überige Tiere"), cex=0.8, fill=c("#c5b87c", "#008099", "#fad60d", "#9ed129", "#e64d00"))
+
+ggplot(data=df.tot, aes(x = 'Quelle', y = Perc, fill=Item), width=0.75)+
+  geom_bar(stat = 'identity')+
+  coord_flip()
+```
+
+```{r, echo=FALSE}
+df.tot <-  read_delim(here("data", "Konsum_2014_15_nach_Art_menuCH_180725_vori.csv"), delim =';', locale = locale(encoding = 'ISO-8859-2'))
+
+```
+
+```{r}
+table(df.tot$Value)
+Fleischart.n <- c(  'verarbeitete Fleischprodukte (15.95)'=15.95, 'Unverarbeitetes rotes Fleisch (14.56)'=15.56, 'Unverarbeitetes Geflügel (9.78)'=9.78)
+
+piepercent<- round(100*Fleischart.n/sum(Fleischart.n), 1)
+pielabels<- paste(piepercent, "%", sep="")
+
+pie(Fleischart.n, labels= pielabels, col = c("#c5b87c", "#008099", "#fad60d"), init.angle = 90, clockwise = T)
+legend("topright", c("verarbeitete Fleischprodukte","Unverarbeitetes rotes Fleisch","Unverarbeitetes Geflügel"), cex=0.8, fill=c("#c5b87c", "#008099", "#fad60d"))
+
+  ggsave(here("figs", "Pie_Fleisch_Art_menuCH_CH.pdf"),
+         width = 17,
+         height = 8,
+         dpi=600,
+         units="in",
+         device="pdf")
+```

@@ -1,5 +1,0 @@
-"0","meat.ch <- read_delim(here(""data"", ""MeatDistribution_NOVANIMAL.csv""), delim = "","")
-"
-"2","Error in read_delim(here(""data"", ""MeatDistribution_NOVANIMAL.csv""), delim = "","") : 
-  could not find function ""read_delim""
-"

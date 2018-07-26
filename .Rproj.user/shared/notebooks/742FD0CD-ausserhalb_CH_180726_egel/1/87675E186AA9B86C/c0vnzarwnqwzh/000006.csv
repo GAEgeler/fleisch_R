@@ -1,0 +1,14 @@
+"0","meat.ch <- read_delim(here(""data"", ""MeatDistribution_NOVANIMAL.csv""), delim = "","")
+"
+"2","Missing column names filled in: 'X1' [1]"
+"2","Parsed with column specification:
+cols(
+  X1 = col_integer(),
+  id_num = col_integer(),
+  Sex = col_integer(),
+  Meat_g = col_double(),
+  Meat_inhouse_g = col_double(),
+  Meat_outhouse_g = col_double(),
+  Season_Wkdays_calib_weights_2rec = col_double()
+)
+"
