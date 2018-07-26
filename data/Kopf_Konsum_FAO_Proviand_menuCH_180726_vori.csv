@@ -1,0 +1,9 @@
+Domain Code;Domain;Country;Element;Item Code;Item;Year;Unit;Value;Quelle
+FBS;Food Balance Sheets;Switzerland;Food supply quantity (kg/capita/yr);2943;Total verfügbares Fleischangebot CH (ohne Auslandseinkäufe);2013;kg pro Kopf und Jahr;72.3;FAO 2013
+FBS;Food Balance Sheets;Switzerland;Food supply quantity (kg/capita/yr);2943;Total verfügbares Fleischangebot CH inkl. geschätzte Auslandeinkäufe (Annahme: Auslandeinkäufe machen 10 Prozent Verbrauch aus) ;2013;kg pro Kopf und Jahr;79.6;Eigene Berechungen aufgrund der FAO Daten 2013
+FBS;Food Balance Sheets;Switzerland;Food supply quantity (kg/capita/yr);2943;Total verfügbares Fleischangebot CH  inkl. geschätzte Auslandeinkäufe (Annahme: Auslandeinkäufe machen 15 Prozent Verbrauch aus) ;2013;kg pro Kopf und Jahr;83.2;Eigene Berechungen aufgrund der FAO Daten 2013
+FBS;Food Balance Sheets;World;Food supply quantity (kg/capita/yr);2943;Total verfügbares Fleischangebot Welt;2013;kg pro Kopf und Jahr;43.2;FAO 2013
+;;;;;Verkaufsgewicht CH (ohne Auslandseinkäufe);2015;kg pro Kopf und Jahr;51.4;Proviande 2015
+;;;;;Verkaufsgewicht CH  inkl. geschätzte Auslandeinkäufe (Annahme: Auslandeinkäufe machen 10 Prozent Verbrauch aus) ;2015;kg pro Kopf und Jahr;57.6;Proviande 2015
+;;;;;Verkaufsgewicht CH inkl. geschätzte Auslandeinkäufe (Annahme: Auslandeinkäufe machen 15 Prozent Verbrauch aus) ;2015;kg pro Kopf und Jahr;60.2;Proviande 2015
+;;;;;Fleischkonsum CH;2014/15;kg pro Kopf und Jahr;40.5;menuCH 2014/15
