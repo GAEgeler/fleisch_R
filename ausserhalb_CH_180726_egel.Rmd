@@ -1,20 +1,177 @@
 ---
 title: "Ausserhaus-Konsum Fleisch"
 author: Gian-andrea Egeler
-date: "26. Juli 2018" 
-output: pdf_document
+date: "27. Juli 2018" 
+output: html_document
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
-```{r}
-plot(cars)
+```{r, message = F,echo = FALSE, warning = FALSE, results = "hide"}
+# load required packages
+packges <-c("readxl","here","psych","reshape2","ggplot2","dplyr","readr","stringr","tidyr") # list of required packages
+
+lapply(packges, require, character.only = T) # dont know what is better require or library
+
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r, warning = FALSE, echo=FALSE, results='hide'}
+# load data meat
+meat.ch <- read_delim(here("data", "MeatDistribution_NOVANIMAL.csv"), delim = ",") %>%
+  select(-X1) %>% # drop X1
+  mutate(gender = ifelse(.$Sex == 2, "F", "M")) # 1 = male, 2 = female
+
+```
+# load data meat
+```{r}
+head(meat.ch) # see raw data
+```
+
+
+# means: meat consumption between gender (not weighted)
+```{r, echo = T, message = F, warning = F}
+
+# female
+meat.ch %>%
+  filter(gender == "F") %>%
+  summarise_all(funs(mean)) %>%
+  select(Meat_g, Meat_inhouse_g, Meat_outhouse_g) # select only interessted variables
+
+
+# male
+meat.ch %>%
+  filter(gender == "M") %>%
+  summarise_all(funs(mean)) %>%
+  select(Meat_g, Meat_inhouse_g, Meat_outhouse_g) # select only interessted variables
+
+```
+# plot meat consumption
+```{r, message=F, echo=F, warning=F,fig.height=10, fig.width=7}
+# prepare data
+df <- meat.ch %>%
+  group_by(gender) %>%
+  summarise_all(funs(mean)) %>%
+  select(Meat_inhouse_g, Meat_outhouse_g, gender) %>%
+  melt(id.vars = "gender") %>% # reshape into long format for plotting
+  rename(consump.meat = value) %>%
+  ungroup() %>% # to group data frame again
+  group_by(gender) %>%
+  mutate(pct = consump.meat/(sum(consump.meat))) # calculate percentage 
+
+# add text for plot
+df$note <- paste("(", round(df$consump.meat, digits = 0), "g",")")
+df$note1 <- paste(round(df$pct*100, digits = 0), "%")
+df$note2 <- paste(df$note1, df$note, sep = "\n")
+
+# load mytheme
+mytheme <- theme_bw()+ # definve theme for plot
+    theme(plot.title = element_text(size = 20, face = "bold"),
+          axis.text.x = element_text(size=20),
+          axis.text.y = element_text(size=20, face = "plain"),
+          legend.text = element_text(size = 20),
+          legend.title = element_text(size =20),
+          axis.title.y = element_text(size = 25, margin = margin(t = 0, r = 20, b = 0, l = 0)),
+          axis.title.x = element_text(size = 25,  margin = margin(t = 20, r = 0, b = 0, l = 0)),
+          plot.subtitle=element_text(margin=margin(b=15),size = 20),
+          plot.caption=element_text(margin=margin(t=15), face="italic", size=20))
+
+
+# plot
+ggplot(df, aes(gender, consump.meat, fill = factor(variable, levels = c("Meat_outhouse_g","Meat_inhouse_g")))) + # set factor for ordering stacked bars
+  geom_bar(stat = "identity", position = "stack", width = .4) + 
+  xlab("")+
+  ylab("Ausserhaus-Konsum von Fleisch")+
+  scale_x_discrete(breaks = c("F","M"),
+                   labels = c("Frau", "Mann"))+ # define labels of xlab
+  scale_fill_manual(values = c("#c5b87c", "#fad60d"), # define color
+                    breaks = c("Meat_outhouse_g","Meat_inhouse_g"),
+                    labels = c("ausser Haus","zuhaus"))+ # define labels of legend
+  guides(fill = guide_legend("Konsum Fleisch"))+
+  geom_text(aes(label = note2), position = position_stack(.7), size = 6)+ # add some information
+  mytheme+ 
+  labs(caption = "Quelle: menuCH 2014/15")
+
+ggsave(here("figs","meat_outside_180727_egel.pdf"),
+       width = 7,
+       height = 8,
+       dpi = 600,
+       device = cairo_pdf)
+
+```
+
+# dairy consumption
+
+```{r}
+# load data
+
+milk.ch <- read_delim(here("data","MilkDistribution_NOVANIMAL.csv"), delim = ',') %>%
+  select(id_num, Sex, Milk_g, Milk_inhouse_g, Milk_outhouse_g) %>%
+  mutate(gender = ifelse(.$Sex == 2, "F", "M")) # add new variable gender; 1 = M, 2 = F
+```
+# load milk data
+```{r}
+head(milk.ch)
+```
+
+
+# means: milk consumption between gender (not weighted)
+```{r, echo = T, message = F, warning = F}
+
+# female
+milk.ch %>%
+  filter(gender == "F") %>%
+  summarise_all(funs(mean)) %>%
+  select(Milk_g, Milk_inhouse_g, Milk_outhouse_g) # select only interessted variables
+
+# male
+milk.ch %>%
+  filter(gender == "M") %>%
+  summarise_all(funs(mean)) %>%
+  select(Milk_g, Milk_inhouse_g, Milk_outhouse_g) # select only interessted variables
+
+```
+
+
+# plot milk consumption
+```{r, message=F, echo=F, warning=F,fig.height=10, fig.width=7}
+# prepare data
+df <- milk.ch %>%
+  group_by(gender) %>%
+  summarise_all(funs(mean)) %>% # means are not weighted
+  select(Milk_inhouse_g, Milk_outhouse_g, gender) %>%
+  melt(id.vars = "gender") %>% # reshape into long format for plotting
+  rename(consump.milk = value) %>%
+  ungroup() %>% # to group data frame again
+  group_by(gender) %>%
+  mutate(pct = consump.milk/(sum(consump.milk))) # calculate percentage 
+
+# add text for plot
+df$note <- paste("(", round(df$consump.milk, digits = 0), "g",")")
+df$note1 <- paste(round(df$pct*100, digits = 0), "%")
+df$note2 <- paste(df$note1, df$note, sep = "\n")
+
+# plot
+ggplot(df, aes(gender, consump.milk, fill = factor(variable, levels = c("Milk_outhouse_g","Milk_inhouse_g")))) + # set factor for ordering stacked bars
+  geom_bar(stat = "identity", position = "stack", width = .4) + 
+  xlab("")+
+  ylab("Ausserhaus-Konsum von Milch")+
+  scale_x_discrete(breaks = c("F","M"),
+                   labels = c("Frau", "Mann"))+ # define labels of xlab
+  scale_fill_manual(values = c("#c5b87c", "#fad60d"), # define color
+                    breaks = c("Milk_outhouse_g","Milk_inhouse_g"),
+                    labels = c("ausser Haus","zuhaus"))+ # define labels of legend
+  guides(fill = guide_legend("Konsum Milch"))+
+  geom_text(aes(label = note2), position = position_stack(.7), size = 6)+ # add some information
+  mytheme+ 
+  labs(caption = "Quelle: menuCH 2014/15")
+
+ggsave(here("figs","milk_outside_180727_egel.pdf"),
+       width = 7,
+       height = 8,
+       dpi = 600,
+       device = cairo_pdf)
+
+```
+
