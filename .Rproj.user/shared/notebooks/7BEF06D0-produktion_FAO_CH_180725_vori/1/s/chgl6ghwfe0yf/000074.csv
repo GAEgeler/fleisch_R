@@ -1,7 +1,0 @@
-"2","Warning in gzfile(file, ""wb"") :"
-"2","
- "
-"2"," cannot open compressed file '//shared.zhaw.ch/shared$/pools/n/N-IUNR-Allgemein/Zentren/gruppe_NOVA/04_f&e/97103165041001_NOVANIMAL_arbeit/07_data/fleisch/fleisch_R/.Rproj.user/shared/notebooks/7BEF06D0-produktion_FAO_CH_180725_vori/1/C23E65EA/chgl6ghwfe0yf_t/7811eb2d794b4b76bd799f782c4da49e.snapshot', probable reason 'No such file or directory'
-"
-"2","Error in gzfile(file, ""wb"") : cannot open the connection
-"

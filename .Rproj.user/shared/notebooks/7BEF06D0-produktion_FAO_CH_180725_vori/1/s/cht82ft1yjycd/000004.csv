@@ -1,4 +1,0 @@
-"0","df.cat$Year <- as.Date.numeric(df.cat$Year)
-"
-"2","Error in as.Date.numeric(df.cat$Year) : 'origin' muss angegeben werden
-"
