@@ -1,0 +1,17 @@
+# do not update selected files
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# ignore subsequent folders
+/data
+/doc
+/figs
+/output
+/R
+
+#ignore subsequent file formats
+*.csv
+*.html
+*.pdf
