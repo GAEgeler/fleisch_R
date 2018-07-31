@@ -3,6 +3,7 @@
 .Rhistory
 .RData
 .Ruserdata
+.Rproj
 
 # ignore subsequent folders
 /data
