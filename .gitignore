@@ -5,6 +5,7 @@
 .Ruserdata
 .Rproj
 
+
 # ignore subsequent folders
 /data
 /doc
